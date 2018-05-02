@@ -25,17 +25,7 @@
     "build": "node build.js",
     "develop": "done-serve --static --develop --port 8080"
   },
-  "main": "dist/cjs/can-realtime-rest-model",
-  "browser": {
-    "transform": [
-      "cssify"
-    ]
-  },
-  "browserify": {
-    "transform": [
-      "cssify"
-    ]
-  },
+  "main": "can-realtime-rest-model",
   "keywords": [
     "canjs",
     "donejs",
@@ -43,7 +33,6 @@
     "model"
   ],
   "steal": {
-    "main": "can-realtime-rest-model",
     "configDependencies": [
       "live-reload"
     ],
@@ -52,30 +41,23 @@
       "generator-donejs",
       "donejs-cli",
       "steal-tools"
-    ],
-    "plugins": [
-      "steal-less",
-      "steal-stache"
     ]
   },
   "dependencies": {
-    "can-component": "^4.0.2",
-    "can-define": "^2.0.1",
-    "can-stache": "^4.1.0",
-    "can-view-autorender": "^4.0.0",
-    "cssify": "^0.6.0",
-    "steal-less": "^1.2.2",
-    "steal-stache": "^4.0.1"
+    "can-connect": "^3.0.0-pre.0",
+    "can-globals": "^1.0.1",
+    "can-namespace": "^1.0.0",
+    "can-query-logic": "<2.0.0",
+    "can-reflect": "^1.15.2"
   },
   "devDependencies": {
+    "can-fixture": "^3.0.0-pre.3",
+    "can-define": "^2.2.0",
     "jshint": "^2.9.1",
     "steal": "^1.6.5",
     "steal-qunit": "^1.0.1",
     "steal-tools": "^1.11.3",
-    "testee": "^0.7.0",
-    "generator-donejs": "^2.1.0",
-    "donejs-cli": "^2.0.0",
-    "done-serve": "^2.0.0"
+    "testee": "^0.7.0"
   },
   "license": "MIT"
 }
