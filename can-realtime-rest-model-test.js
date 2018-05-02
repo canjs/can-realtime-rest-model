@@ -3,7 +3,6 @@ var fixture = require("can-fixture");
 var DefineMap = require("can-define/map/map");
 var DefineList = require("can-define/list/list");
 var realtimeRestModel = require("./can-realtime-rest-model");
-var GLOBAL = require("can-globals/global/global");
 //var stealClone = require("steal-clone");
 var QueryLogic = require("can-query-logic");
 var canReflect = require("can-reflect");
