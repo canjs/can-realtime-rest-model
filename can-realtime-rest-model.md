@@ -1,6 +1,7 @@
 @module {function} can-realtime-rest-model
 @parent can-data-modeling
 @collection can-core
+@outline 2
 
 @description Connect a type to a restful data source and automatically manage
 lists.
@@ -21,7 +22,7 @@ everyone else, use `realtimeRestModel` as it adds the following behaviors on top
 `realtimeRestModel` is useful even if you are not building a realtime
 application. It allows you to make changes to instances
 and have the lists in the page update themselves
-automatically.  
+automatically. This is detailed in the [Purpose](#Purpose) section below.
 
 If your service layer matches what `realtimeRestModel` expects, configuring  
 `realtimeRestModel` is very simple.  For example,
@@ -43,7 +44,7 @@ const TodoList = DefineList.extend("TodoList",{
     }
 })
 
-realtimeRestModel({
+const todoConnection = realtimeRestModel({
     Map: Todo,
     List: TodoList,
     url: "/todos/{id}"
@@ -91,8 +92,8 @@ realtimeRestModel({
   given the results of [can-connect/connection.getData], [can-connect/connection.createData],
   [can-connect/connection.updateData],
   and [can-connect/connection.destroyData].
-- [can-connect/data/parse/parse.parseListProp]
-- [can-connect/data/parse/parse.parseListData]
+- [can-connect/data/parse/parse.parseListProp] Specify the property to find the list data within a `getList` response.
+- [can-connect/data/parse/parse.parseListData] Return the correctly formatted data for a `getList` response.
 - [can-connect/base/base.queryLogic] - Specify the identity properties of the
   type. This is built automatically from the `Map` if [can-define/map/map] is used.
 
@@ -103,6 +104,13 @@ that `realtimeRestModel` adds.
 @body
 
 ## Purpose
+
+`realtimeRestModel` extends [can-rest-model] with two new features:
+
+- Automatic list management
+- Unified instances and lists across requests with list and instance stores.
+
+### Automatic list management
 
 `realtimeRestModel` allows you to make changes to instances
 and have the lists in the page update themselves
@@ -124,7 +132,7 @@ Component.extend({
     `,
     ViewModel: {
         todosPromise: {
-            value: () => Todo.getList({
+            default: () => Todo.getList({
                 filter: {complete: true},
                 sort: "name"
             })
@@ -168,13 +176,81 @@ will update automatically. For example:
   todo.destroy();
   ```
 
+### List and instance stores
+
+Additionally, `realtimeRestModel` unifies record and list instances.  This means that if you
+request the same data twice, only one instance will be created
+and shared. For example, if a `<todo-details>` widget loads the `id=5` todo like:
+
+```js
+import {Component} from "can";
+import Todo from "../models/todo";
+
+Component.extend({
+    tag: "todo-details",
+    view: `
+        Todo Name is: {{todoPromise.value.name}}
+    `,
+    ViewModel: {
+        todoPromise: {
+            default: () => Todo.get({
+                id: 5
+            })
+        }
+    }
+})
+```
+
+And another `<todo-edit>` widget loads the same data independently:
+
+
+```js
+import {Component} from "can";
+import Todo from "../models/todo";
+
+Component.extend({
+    tag: "todo-edit",
+    view: `
+        Todo name is: <input value:bind="todoPromise.value.name"/>
+    `,
+    ViewModel: {
+        todoPromise: {
+            default: () => Todo.get({
+                id: 5
+            })
+        }
+    }
+})
+```
+
+If the user changes the todo's name in the `<todo-edit>` widget, the` <todo-details>`
+widget will be automatically updated.
+
+Furthermore, if you wish to update the data in the page, you simply need to re-request the
+data like:
+
+```js
+// Updates the id=5 todo instance
+Todo.get({id: 5})
+
+// Updates all incomplete todos
+Todo.getList({ filter: { complete: false } })
+```
+
+
 ## Use
 
 Use `realtimeRestModel` to build a connection to a restful service
 layer. `realtimeRestModel` builds on top of [can-rest-model]. Please
-read the _"Use"_ section of [can-rest-model] before reading this _"Use"_ section.  
-This _"Use"_ section details the knowledge needed in addition to  [can-rest-model]
-to make `realtimeRestModel` work.
+read the _"Use"_ section of [can-rest-model] before reading this _"Use"_ section.
+This _"Use"_ section details knowledge needed in addition to  [can-rest-model]
+to use `realtimeRestModel`.
+
+- Configuring queryLogic
+- Updating the page from server-side events  
+- Simulating server-side events with [can-fixture]
+
+### Configuring queryLogic
 
 `realtimeRestModel` requires a properly
 configured [can-connect/base/base.queryLogic]. If you server supports
@@ -211,3 +287,77 @@ If you control the service layer, we __encourage__ you to make it match the defa
 For more information on this `query` structure and how to configure a query logic
 to match your service layer, read
 [the configuration section of can-query-logic](./can-query-logic.html#Configuration).
+
+
+### Updating the page from server-side events  
+
+If your service layer can push events, you can call the connection's
+[can-connect/real-time/real-time.createInstance],
+[can-connect/real-time/real-time.updateInstance], and [can-connect/real-time/real-time.destroyInstance]
+to update the lists and instances on the page.  For example, if you have a socket.io connection,
+you can listen to events and call these methods on the `connection` as follows:
+
+```js
+import io from 'steal-socket.io';
+
+const todoConnection = realtimeRestModel({
+    Map: Todo,
+    List: TodoList,
+    url: "/todos/{id}"
+});
+
+socket.on('todo created', function(todo){
+  todoConnection.createInstance(order);
+});
+
+socket.on('todo updated', function(todo){
+  todoConnection.updateInstance(order);
+});
+
+socket.on('todo removed', function(todo){
+  todoConnection.destroyInstance(order);
+});
+```
+
+### Simulating server-side events with can-fixture
+
+[can-fixture] does not allow you to simulate server-side events. However, this
+can be done relatively easily by calling [can-connect/real-time/real-time.createInstance],
+[can-connect/real-time/real-time.updateInstance], or [can-connect/real-time/real-time.destroyInstance]
+on your connection directly as follows:
+
+```js
+test("widget response to server-side events", function(assert){
+    var todoList = new TodoListComponent();
+
+    todoConnection.createInstance({
+        id: 5,
+        name: "learn how to test",
+        complete: false
+    }).then(function(){
+        // check to see that the list has been updated
+        assert.ok( /learn how to test/.test(todoList.element.innerHTML) );
+    });
+});
+```
+
+While this works, this doesn't make sure the record's data is in the fixture
+[can-fixture.store]. The fixture store also will add a unique `id`
+property. To make sure the record is in the store, use `store.createInstance` on the store and
+pass the result to `connection.createInstance` as follows:
+
+```js
+test("widget response to server-side events", function(assert){
+    var todoList = new TodoListComponent();
+
+    todoStore.createInstance({
+        name: "learn how to test",
+        complete: false
+    }).then(function(record){
+        return todoConnection.createInstance(record)
+    }).then(function(){
+        // check to see that the list has been updated
+        assert.ok( /learn how to test/.test(todoList.element.innerHTML) );
+    });
+});
+```
