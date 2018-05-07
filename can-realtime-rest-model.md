@@ -24,8 +24,7 @@ application. It allows you to make changes to instances
 and have the lists in the page update themselves
 automatically. This is detailed in the [Purpose](#Purpose) section below.
 
-If your service layer matches what `realtimeRestModel` expects, configuring  
-`realtimeRestModel` is very simple.  For example,
+If your service layer matches what `realtimeRestModel` expects, configuring `realtimeRestModel` is very simple. For example,
 the following defines a `Todo` and `TodoList` type and extends them
 with the ability to connect to a restful service layer:
 
@@ -78,14 +77,14 @@ const todoConnection = realtimeRestModel({
 
   ```js
   url: {
-    getListData: "GET /services/todos",
-    getData: "GET /services/todo/{id}",
-    createData: "POST /services/todo",
-    updateData: "PUT /services/todo/{id}",
-    destroyData: "DELETE /services/todo/{id}"
+    getListData: "GET /api/todos/find",
+    getData: "GET /api/todo/get/{id}",
+    createData: "POST /api/todo/create",
+    updateData: "POST /api/todo/update?id={id}",
+    destroyData: "POST /api/todo/delete?id={id}"
   }
   ```
-- [can-connect/data/url/url.ajax] - Specify a method to use to make requests. [can-ajax] is used by default.  But jQuery's `.ajax` method can be passed.
+- [can-connect/data/url/url.ajax] - Specify a method to use to make requests; [can-ajax] is used by default, but jQuery's `.ajax` method can be passed.
 - [can-connect/data/parse/parse.parseInstanceProp] - Specify the property to find the data that represents an instance item.
 - [can-connect/data/parse/parse.parseInstanceData] - Returns the properties that should be used to
   [can-connect/constructor/constructor.hydrateInstance make an instance]
@@ -272,11 +271,11 @@ Todo.getList({
 
 This structures follows the [Fetching Data JSONAPI specification](http://jsonapi.org/format/#fetching).
 
-There's:
+There's a:
 
-- a [filter](http://jsonapi.org/format/#fetching-filtering) property for filtering records,
-- a [sort](http://jsonapi.org/format/#fetching-sorting) property for specifying the order to sort records, and
-- a [page](http://jsonapi.org/format/#fetching-pagination) property that selects a range of the sorted result. _The range indexes are inclusive_.
+- [filter](http://jsonapi.org/format/#fetching-filtering) property for filtering records,
+- [sort](http://jsonapi.org/format/#fetching-sorting) property for specifying the order to sort records, and
+- [page](http://jsonapi.org/format/#fetching-pagination) property that selects a range of the sorted result. _The range indexes are inclusive_. Example: `{page: 0, end: 9}` returns 10 records.
 
 > __NOTE__: [can-connect] does not follow the rest of the JSONAPI specification. Specifically
 > [can-connect] expects your server to send back JSON data in a format described in [can-rest-model].
@@ -307,15 +306,15 @@ const todoConnection = realtimeRestModel({
 });
 
 socket.on('todo created', function(todo){
-  todoConnection.createInstance(order);
+  todoConnection.createInstance(todo);
 });
 
 socket.on('todo updated', function(todo){
-  todoConnection.updateInstance(order);
+  todoConnection.updateInstance(todo);
 });
 
 socket.on('todo removed', function(todo){
-  todoConnection.destroyInstance(order);
+  todoConnection.destroyInstance(todo);
 });
 ```
 
