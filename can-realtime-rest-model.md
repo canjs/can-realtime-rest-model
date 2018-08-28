@@ -27,14 +27,19 @@ automatically. This is detailed in the [Purpose](#Purpose) section below.
 If your service layer matches what `realtimeRestModel` expects, configuring `realtimeRestModel` is very simple. For example, the following extends a `Todo` type with the ability to connect to a restful service layer:
 
 ```js
-import {TodoAll as Todo} from "//unpkg.com/can-demo-models@5";
+import {Todo, todoFixture} from "//unpkg.com/can-demo-models@5";
 import {realtimeRestModel} from "can";
+
+// Creates a mock backend with 5 todos
+todoFixture(5);
 
 Todo.connection = realtimeRestModel({
     Map: Todo,
     List: Todo.List,
     url: "/api/todos/{id}"
 });
+
+// Prints out all todo names
 
 Todo.getList().then(todos => {
     todos.forEach(todo => {
@@ -111,9 +116,12 @@ automatically. This can remove a lot of boilerplate from your
 application. For example, if you make a simple component that
 displays only completed todos sorted by name like:
 
-```js
+```html
+<completed-todos />
+
+<script>
 import {Component} from "can";
-import Todo from "../models/todo";
+import {Todo} from "../models/todo";
 
 Component.extend({
     tag: "completed-todos",
@@ -132,6 +140,7 @@ Component.extend({
         }
     }
 })
+</script>
 ```
 
 If other components are creating, updating, or destroying todos, this component
@@ -169,16 +178,74 @@ will update automatically. For example:
   todo.destroy();
   ```
 
-The following demo uses `realtimeRestModel` to create a filterable and sortable grid that automatically updates itself when todos are created, updated or destroyed.
+The following code example uses `realtimeRestModel` to create a list of todos that automatically updates itself when new todos are created.
 
-Try out some of the following use cases to see `realtimeRestModel`'s automatic list management in action:
+```html
+<todo-create></todo-create>
+<todo-list></todo-list>
 
-- Delete a todo and the todo will be removed from the list.
-- Sort by date, then create a todo and the todo will be inserted into the right place in the list.
-- Sort by date, then edit a todo's dueDate and the todo will be moved to the right place in the list.
-- Show only Complete todos, then toggle the todo's complete status and the todo will be removed from the view.
+<script type="module">
+import {realtimeRestModel, Component} from "can";
+import {Todo, todoFixture} from "//unpkg.com/can-demo-models@5";
 
-@demo demos/can-realtime-rest-model/can-realtime-rest-model.html
+// Creates a mock backend with 5 todos
+todoFixture(5);
+
+Todo.connection = realtimeRestModel({
+    Map: Todo,
+    List: Todo.List,
+    url: "/api/todos/{id}"
+});
+
+Component.extend({
+    tag: "todo-list",
+    view: `
+    <ul>
+        {{# if(todosPromise.isResolved) }}
+            {{# each(todosPromise.value) }}
+                <li>
+                    <label>{{name}}</label>
+                </li>
+            {{/ each }}
+        {{/ if}}
+    </ul>
+    `,
+    ViewModel: {
+        todosPromise: {
+            get(){
+                return Todo.getList();
+            }
+        }
+    }
+});
+
+Component.extend({
+    tag: "todo-create",
+    view: `
+        <form on:submit="createTodo(scope.event)">
+            <p>
+                <label>Name</label>
+                <input on:input:value:bind='todo.name'/>
+            </p>
+            <button disabled:from="todo.isSaving()">Create Todo</button>
+            {{# if(todo.isSaving()) }}Creating ....{{/ if}}
+        </form>
+    `,
+    ViewModel: {
+        todo: {
+            Default: Todo
+        },
+        createTodo(event) {
+            event.preventDefault();
+            this.todo.save().then((createdTodo) => {
+                this.todo = new Todo();
+            })
+        }
+    }
+});
+</script>
+```
+@codepen
 
 ### List and instance stores
 
