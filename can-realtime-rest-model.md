@@ -24,31 +24,25 @@ application. It allows you to make changes to instances
 and have the lists in the page update themselves
 automatically. This is detailed in the [Purpose](#Purpose) section below.
 
-If your service layer matches what `realtimeRestModel` expects, configuring `realtimeRestModel` is very simple. For example,
-the following defines a `Todo` and `TodoList` type and extends them
-with the ability to connect to a restful service layer:
+If your service layer matches what `realtimeRestModel` expects, configuring `realtimeRestModel` is very simple. For example, the following extends a `Todo` type with the ability to connect to a restful service layer:
 
 ```js
-import {DefineMap, DefineList, realtimeRestModel} from "can";
+import {TodoAll as Todo} from "//unpkg.com/can-demo-models@5";
+import {realtimeRestModel} from "can";
 
-const Todo = DefineMap.extend("Todo",{
-    id: {identity: true},
-    name: "string",
-    complete: "boolean"
-})
-
-const TodoList = DefineList.extend("TodoList",{
-    get completeCount(){
-        return this.filter({complete: true}).length;
-    }
-})
-
-const todoConnection = realtimeRestModel({
+Todo.connection = realtimeRestModel({
     Map: Todo,
-    List: TodoList,
-    url: "/todos/{id}"
+    List: Todo.List,
+    url: "/api/todos/{id}"
 });
+
+Todo.getList().then(todos => {
+    todos.forEach(todo => {
+        console.log(todo.name);
+    })
+})
 ```
+  @codepen
 
 @param {Object} options Configuration options supported by all the mixed-in behaviors:
 
@@ -153,7 +147,7 @@ will update automatically. For example:
   `{ filter: {complete: true}, sort: "name" }` doesn't contain data like
   `{name: "walk dog", complete: true}`.
 
-- Creating an incomplete todo will __not__ update the `<completed-todos>`'s list:
+- Creating a todo with `complete: false` will __not__ update the `<completed-todos>`'s list:
   ```js
   new Todo({name: "walk dog", complete: false}).save();
   ```
@@ -163,7 +157,7 @@ will update automatically. For example:
 
 - Updating a todo's `name` or `complete` value will move the todo
   in or out of the `<completed-todos>`'s list and put it in the
-  right position.  For example, a todo that's incomplete will be
+  right position.  For example, a todo that's not complete can be
   moved into the list like:
 
   ```js
@@ -174,6 +168,17 @@ will update automatically. For example:
   ```js
   todo.destroy();
   ```
+
+The following demo uses `realtimeRestModel` to create a filterable and sortable grid that automatically updates itself when todos are created, updated or destroyed.
+
+Try out some of the following use cases to see `realtimeRestModel`'s automatic list management in action:
+
+- Delete a todo and the todo will be removed from the list.
+- Sort by date, then create a todo and the todo will be inserted into the right place in the list.
+- Sort by date, then edit a todo's dueDate and the todo will be moved to the right place in the list.
+- Show only Complete todos, then toggle the todo's complete status and the todo will be removed from the view.
+
+@demo demos/can-realtime-rest-model/can-realtime-rest-model.html
 
 ### List and instance stores
 
@@ -243,7 +248,7 @@ Use `realtimeRestModel` to build a connection to a restful service
 layer. `realtimeRestModel` builds on top of [can-rest-model]. Please
 read the _"Use"_ section of [can-rest-model] before reading this _"Use"_ section.
 This _"Use"_ section details knowledge needed in addition to  [can-rest-model]
-to use `realtimeRestModel`.
+to use `realtimeRestModel`, such as:
 
 - Configuring queryLogic
 - Updating the page from server-side events  
@@ -252,7 +257,7 @@ to use `realtimeRestModel`.
 ### Configuring queryLogic
 
 `realtimeRestModel` requires a properly
-configured [can-connect/base/base.queryLogic]. If you server supports
+configured [can-connect/base/base.queryLogic]. If your server supports
 `getList` parameters that match [can-query-logic/query can-query-logic's default query structure], then no configuration
 is likely necessary. The default `query` structure looks like:
 
@@ -302,7 +307,7 @@ import io from 'steal-socket.io';
 const todoConnection = realtimeRestModel({
     Map: Todo,
     List: TodoList,
-    url: "/todos/{id}"
+    url: "/api/todos/{id}"
 });
 
 socket.on('todo created', function(todo){
@@ -327,7 +332,7 @@ on your connection directly as follows:
 
 ```js
 test("widget response to server-side events", function(assert){
-    var todoList = new TodoListComponent();
+    let todoList = new TodoListComponent();
 
     todoConnection.createInstance({
         id: 5,
@@ -340,14 +345,14 @@ test("widget response to server-side events", function(assert){
 });
 ```
 
-While this works, this doesn't make sure the record's data is in the fixture
+While this works, it doesn't make sure the record's data is in the fixture
 [can-fixture.store]. The fixture store also will add a unique `id`
 property. To make sure the record is in the store, use `store.createInstance` on the store and
 pass the result to `connection.createInstance` as follows:
 
 ```js
 test("widget response to server-side events", function(assert){
-    var todoList = new TodoListComponent();
+    let todoList = new TodoListComponent();
 
     todoStore.createInstance({
         name: "learn how to test",
