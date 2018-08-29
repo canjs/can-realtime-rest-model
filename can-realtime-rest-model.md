@@ -251,11 +251,25 @@ Component.extend({
 
 Additionally, `realtimeRestModel` unifies record and list instances.  This means that if you
 request the same data twice, only one instance will be created
-and shared. For example, if a `<todo-details>` widget loads the `id=5` todo like:
+and shared. For example, if a `<todo-details>` widget loads the `id=5` todo, and another `<todo-edit>` widget loads the same data independently like:
 
-```js
-import {Component} from "can";
-import Todo from "../models/todo";
+```html
+<todo-edit></todo-edit>
+<br /></br />
+<todo-details></todo-details>
+
+<script type="module">
+import {realtimeRestModel, Component} from "can";
+import {Todo, todoFixture} from "//unpkg.com/can-demo-models@5";
+
+// Creates a mock backend with 6 todos
+todoFixture(6);
+
+Todo.connection = realtimeRestModel({
+    Map: Todo,
+    List: Todo.List,
+    url: "/api/todos/{id}"
+});
 
 Component.extend({
     tag: "todo-details",
@@ -270,14 +284,6 @@ Component.extend({
         }
     }
 })
-```
-
-And another `<todo-edit>` widget loads the same data independently:
-
-
-```js
-import {Component} from "can";
-import Todo from "../models/todo";
 
 Component.extend({
     tag: "todo-edit",
@@ -292,7 +298,10 @@ Component.extend({
         }
     }
 })
+
+</script>
 ```
+@codepen
 
 If the user changes the todo's name in the `<todo-edit>` widget, the` <todo-details>`
 widget will be automatically updated.
