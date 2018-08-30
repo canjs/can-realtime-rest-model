@@ -24,31 +24,30 @@ application. It allows you to make changes to instances
 and have the lists in the page update themselves
 automatically. This is detailed in the [Purpose](#Purpose) section below.
 
-If your service layer matches what `realtimeRestModel` expects, configuring `realtimeRestModel` is very simple. For example,
-the following defines a `Todo` and `TodoList` type and extends them
-with the ability to connect to a restful service layer:
+If your service layer matches what `realtimeRestModel` expects, configuring `realtimeRestModel` is very simple. For example, the following extends a `Todo` type with the ability to connect to a restful service layer:
 
 ```js
-import {DefineMap, DefineList, realtimeRestModel} from "can";
+import {Todo, todoFixture} from "//unpkg.com/can-demo-models@5";
+import {realtimeRestModel} from "can";
 
-const Todo = DefineMap.extend("Todo",{
-    id: {identity: true},
-    name: "string",
-    complete: "boolean"
-})
+// Creates a mock backend with 5 todos
+todoFixture(5);
 
-const TodoList = DefineList.extend("TodoList",{
-    get completeCount(){
-        return this.filter({complete: true}).length;
-    }
-})
-
-const todoConnection = realtimeRestModel({
+Todo.connection = realtimeRestModel({
     Map: Todo,
-    List: TodoList,
-    url: "/todos/{id}"
+    List: Todo.List,
+    url: "/api/todos/{id}"
 });
+
+// Prints out all todo names
+
+Todo.getList().then(todos => {
+    todos.forEach(todo => {
+        console.log(todo.name);
+    })
+})
 ```
+  @codepen
 
 @param {Object} options Configuration options supported by all the mixed-in behaviors:
 
@@ -117,9 +116,12 @@ automatically. This can remove a lot of boilerplate from your
 application. For example, if you make a simple component that
 displays only completed todos sorted by name like:
 
-```js
+```html
+<completed-todos />
+
+<script>
 import {Component} from "can";
-import Todo from "../models/todo";
+import {Todo} from "../models/todo";
 
 Component.extend({
     tag: "completed-todos",
@@ -138,6 +140,7 @@ Component.extend({
         }
     }
 })
+</script>
 ```
 
 If other components are creating, updating, or destroying todos, this component
@@ -153,7 +156,7 @@ will update automatically. For example:
   `{ filter: {complete: true}, sort: "name" }` doesn't contain data like
   `{name: "walk dog", complete: true}`.
 
-- Creating an incomplete todo will __not__ update the `<completed-todos>`'s list:
+- Creating a todo with `complete: false` will __not__ update the `<completed-todos>`'s list:
   ```js
   new Todo({name: "walk dog", complete: false}).save();
   ```
@@ -163,7 +166,7 @@ will update automatically. For example:
 
 - Updating a todo's `name` or `complete` value will move the todo
   in or out of the `<completed-todos>`'s list and put it in the
-  right position.  For example, a todo that's incomplete will be
+  right position.  For example, a todo that's not complete can be
   moved into the list like:
 
   ```js
@@ -175,15 +178,98 @@ will update automatically. For example:
   todo.destroy();
   ```
 
+The following code example uses `realtimeRestModel` to create a list of todos that automatically updates itself when new todos are created.
+
+```html
+<todo-create></todo-create>
+<todo-list></todo-list>
+
+<script type="module">
+import {realtimeRestModel, Component} from "can";
+import {Todo, todoFixture} from "//unpkg.com/can-demo-models@5";
+
+// Creates a mock backend with 5 todos
+todoFixture(5);
+
+Todo.connection = realtimeRestModel({
+    Map: Todo,
+    List: Todo.List,
+    url: "/api/todos/{id}"
+});
+
+Component.extend({
+    tag: "todo-list",
+    view: `
+    <ul>
+        {{# if(todosPromise.isResolved) }}
+            {{# each(todosPromise.value) }}
+                <li>
+                    <label>{{name}}</label>
+                </li>
+            {{/ each }}
+        {{/ if}}
+    </ul>
+    `,
+    ViewModel: {
+        todosPromise: {
+            get(){
+                return Todo.getList();
+            }
+        }
+    }
+});
+
+Component.extend({
+    tag: "todo-create",
+    view: `
+        <form on:submit="createTodo(scope.event)">
+            <p>
+                <label>Name</label>
+                <input on:input:value:bind='todo.name'/>
+            </p>
+            <button disabled:from="todo.isSaving()">Create Todo</button>
+            {{# if(todo.isSaving()) }}Creating ....{{/ if}}
+        </form>
+    `,
+    ViewModel: {
+        todo: {
+            Default: Todo
+        },
+        createTodo(event) {
+            event.preventDefault();
+            this.todo.save().then((createdTodo) => {
+                this.todo = new Todo();
+            })
+        }
+    }
+});
+</script>
+```
+@codepen
+
 ### List and instance stores
 
 Additionally, `realtimeRestModel` unifies record and list instances.  This means that if you
 request the same data twice, only one instance will be created
-and shared. For example, if a `<todo-details>` widget loads the `id=5` todo like:
+and shared. For example, if a `<todo-details>` widget loads the `id=5` todo, and another `<todo-edit>` widget loads the same data independently like:
 
-```js
-import {Component} from "can";
-import Todo from "../models/todo";
+```html
+<todo-edit></todo-edit>
+<br /></br />
+<todo-details></todo-details>
+
+<script type="module">
+import {realtimeRestModel, Component} from "can";
+import {Todo, todoFixture} from "//unpkg.com/can-demo-models@5";
+
+// Creates a mock backend with 6 todos
+todoFixture(6);
+
+Todo.connection = realtimeRestModel({
+    Map: Todo,
+    List: Todo.List,
+    url: "/api/todos/{id}"
+});
 
 Component.extend({
     tag: "todo-details",
@@ -198,14 +284,6 @@ Component.extend({
         }
     }
 })
-```
-
-And another `<todo-edit>` widget loads the same data independently:
-
-
-```js
-import {Component} from "can";
-import Todo from "../models/todo";
 
 Component.extend({
     tag: "todo-edit",
@@ -220,7 +298,10 @@ Component.extend({
         }
     }
 })
+
+</script>
 ```
+@codepen
 
 If the user changes the todo's name in the `<todo-edit>` widget, the` <todo-details>`
 widget will be automatically updated.
@@ -243,7 +324,7 @@ Use `realtimeRestModel` to build a connection to a restful service
 layer. `realtimeRestModel` builds on top of [can-rest-model]. Please
 read the _"Use"_ section of [can-rest-model] before reading this _"Use"_ section.
 This _"Use"_ section details knowledge needed in addition to  [can-rest-model]
-to use `realtimeRestModel`.
+to use `realtimeRestModel`, such as:
 
 - Configuring queryLogic
 - Updating the page from server-side events  
@@ -252,7 +333,7 @@ to use `realtimeRestModel`.
 ### Configuring queryLogic
 
 `realtimeRestModel` requires a properly
-configured [can-connect/base/base.queryLogic]. If you server supports
+configured [can-connect/base/base.queryLogic]. If your server supports
 `getList` parameters that match [can-query-logic/query can-query-logic's default query structure], then no configuration
 is likely necessary. The default `query` structure looks like:
 
@@ -302,7 +383,7 @@ import io from 'steal-socket.io';
 const todoConnection = realtimeRestModel({
     Map: Todo,
     List: TodoList,
-    url: "/todos/{id}"
+    url: "/api/todos/{id}"
 });
 
 socket.on('todo created', function(todo){
@@ -327,7 +408,7 @@ on your connection directly as follows:
 
 ```js
 test("widget response to server-side events", function(assert){
-    var todoList = new TodoListComponent();
+    let todoList = new TodoListComponent();
 
     todoConnection.createInstance({
         id: 5,
@@ -340,14 +421,14 @@ test("widget response to server-side events", function(assert){
 });
 ```
 
-While this works, this doesn't make sure the record's data is in the fixture
+While this works, it doesn't make sure the record's data is in the fixture
 [can-fixture.store]. The fixture store also will add a unique `id`
 property. To make sure the record is in the store, use `store.createInstance` on the store and
 pass the result to `connection.createInstance` as follows:
 
 ```js
 test("widget response to server-side events", function(assert){
-    var todoList = new TodoListComponent();
+    let todoList = new TodoListComponent();
 
     todoStore.createInstance({
         name: "learn how to test",
