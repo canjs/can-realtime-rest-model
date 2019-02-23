@@ -1,6 +1,6 @@
 # can-realtime-rest-model
 
-[![Build Status](https://travis-ci.org/canjs/can-realtime-rest-model.svg?branch=master)](https://travis-ci.org/canjs/can-realtime-rest-model)
+[![Build Status](https://travis-ci.org/canjs/can-realtime-rest-model.svg?branch=master)](https://travis-ci.org/canjs/can-realtime-rest-model) [![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-realtime-rest-model.svg)](https://greenkeeper.io/)
 
 Turn a map into a realtime rest model
 

@@ -52,10 +52,10 @@
   "devDependencies": {
     "can-fixture": "^3.0.0",
     "jshint": "^2.9.1",
-    "steal": "^1.6.5",
+    "steal": "^2.1.14",
     "steal-qunit": "^1.0.1",
-    "steal-tools": "^1.11.3",
-    "testee": "^0.7.0"
+    "steal-tools": "^2.0.11",
+    "testee": "^0.9.0"
   },
   "license": "MIT"
 }
