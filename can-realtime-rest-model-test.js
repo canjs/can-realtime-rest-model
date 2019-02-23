@@ -134,3 +134,10 @@ QUnit.test("basics", function(assert){
     });
 
 });
+
+QUnit.test("string signature", function(assert) {
+    var connection = realtimeRestModel("/api/todos/{_id}");
+
+    assert.ok(new connection.Map() instanceof DefineMap, "Map defined");
+    assert.ok(new connection.List() instanceof DefineList, "List defined");
+});

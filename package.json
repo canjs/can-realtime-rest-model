@@ -42,15 +42,15 @@
     ]
   },
   "dependencies": {
-    "can-connect": "^3.0.0-pre.0",
+    "can-connect": "^3.0.0",
+    "can-define": "^2.2.0",
     "can-globals": "^1.0.1",
     "can-namespace": "^1.0.0",
     "can-query-logic": "<2.0.0",
     "can-reflect": "^1.15.2"
   },
   "devDependencies": {
-    "can-fixture": "^3.0.0-pre.3",
-    "can-define": "^2.2.0",
+    "can-fixture": "^3.0.0",
     "jshint": "^2.9.1",
     "steal": "^1.6.5",
     "steal-qunit": "^1.0.1",

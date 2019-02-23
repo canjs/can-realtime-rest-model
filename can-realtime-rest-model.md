@@ -1,6 +1,7 @@
 @module {function} can-realtime-rest-model
 @parent can-data-modeling
 @collection can-core
+@package ./package.json
 @outline 2
 
 @description Connect a type to a restful data source and automatically manage
@@ -97,6 +98,38 @@ Todo.getList().then(todos => {
 
 @return {connection} A connection that is the combination of the options and all the behaviors
 that `realtimeRestModel` adds.
+
+@signature `realtimeRestModel(url)`
+
+Create a connection with just a url. Use this if you do not need to pass in any other `options` to configure the connection.
+
+For example, the following creates a `Todo` type with the ability to connect to a restful service layer:
+
+```js
+import {todoFixture} from "//unpkg.com/can-demo-models@5";
+import {realtimeRestModel} from "can";
+
+// Creates a mock backend with 5 todos
+todoFixture(5);
+
+const Todo = realtimeRestModel("/api/todos/{id}").Map;
+
+// Prints out all todo names
+
+Todo.getList().then(todos => {
+    todos.forEach(todo => {
+        console.log(todo.name);
+    })
+})
+```
+  @codepen
+
+@param {String} url The [can-connect/data/url/url.url] used to create, retrieve, update and
+  delete data.
+
+@return {connection} A connection that is the combination of the options and all the behaviors
+that `realtimeRestModel` adds. The `connection` includes a `Map` property which is the type
+constructor function used to create instances of the raw record data retrieved from the server.
 
 
 @body
