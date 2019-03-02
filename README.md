@@ -5,8 +5,6 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/canjs/can-realtime-rest-model/blob/master/LICENSE)
 [![npm version](https://badge.fury.io/js/can-realtime-rest-model.svg)](https://www.npmjs.com/package/can-realtime-rest-model)
 [![Travis build status](https://travis-ci.org/canjs/can-realtime-rest-model.svg?branch=master)](https://travis-ci.org/canjs/can-realtime-rest-model)
-[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/canjs/can-realtime-rest-model?branch=master&svg=true)](https://ci.appveyor.com/project/matthewp/can-realtime-rest-model)
-[![Coverage status](https://coveralls.io/repos/github/canjs/can-realtime-rest-model/badge.svg?branch=master)](https://coveralls.io/github/canjs/can-realtime-rest-model?branch=master)
 [![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-realtime-rest-model.svg)](https://greenkeeper.io/)
 
 Turn a map into a realtime rest model
