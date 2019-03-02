@@ -1,32 +1,26 @@
 # can-realtime-rest-model
 
-[![Build Status](https://travis-ci.org/canjs/can-realtime-rest-model.svg?branch=master)](https://travis-ci.org/canjs/can-realtime-rest-model) [![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-realtime-rest-model.svg)](https://greenkeeper.io/)
+[![Join our Slack](https://img.shields.io/badge/slack-join%20chat-611f69.svg)](https://www.bitovi.com/community/slack?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join our Discourse](https://img.shields.io/discourse/https/forums.bitovi.com/posts.svg)](https://forums.bitovi.com/?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/canjs/can-realtime-rest-model/blob/master/LICENSE)
+[![npm version](https://badge.fury.io/js/can-realtime-rest-model.svg)](https://www.npmjs.com/package/can-realtime-rest-model)
+[![Travis build status](https://travis-ci.org/canjs/can-realtime-rest-model.svg?branch=master)](https://travis-ci.org/canjs/can-realtime-rest-model)
+[![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-realtime-rest-model.svg)](https://greenkeeper.io/)
 
 Turn a map into a realtime rest model
 
-## Usage
+## Documentation
 
-### ES6 use
+Read the [can-realtime-rest-model API docs on CanJS.com](https://canjs.com/doc/can-realtime-rest-model.html).
 
-With StealJS, you can import this module directly in a template that is autorendered:
+## Changelog
 
-```js
-import plugin from 'can-realtime-rest-model';
-```
+See the [latest releases on GitHub](https://github.com/canjs/can-realtime-rest-model/releases).
 
-### CommonJS use
+## Contributing
 
-Use `require` to load `can-realtime-rest-model` and everything else
-needed to create a template that uses `can-realtime-rest-model`:
+The [contribution guide](https://github.com/canjs/can-realtime-rest-model/blob/master/CONTRIBUTING.md) has information on getting help, reporting bugs, developing locally, and more.
 
-```js
-var plugin = require("can-realtime-rest-model");
-```
+## License
 
-### Standalone use
-
-Load the `global` version of the plugin:
-
-```html
-<script src='./node_modules/can-realtime-rest-model/dist/global/can-realtime-rest-model.js'></script>
-```
+[MIT](https://github.com/canjs/can-realtime-rest-model/blob/master/LICENSE)
