@@ -46,7 +46,7 @@ QUnit.test("basics", function(assert){
     var todoStore = fixture.store([],new QueryLogic(Todo));
 
     fixture("/api/todos/{_id}",todoStore);
-    QUnit.stop();
+    var done = assert.async();
 
     var createdTodo,
         allList,
@@ -81,7 +81,7 @@ QUnit.test("basics", function(assert){
             return connection.createInstance(instance);
         }).then(function(created){
             pushCreatedTodo = created;
-            QUnit.ok(created._id, "has an id");
+            assert.ok(created._id, "has an id");
             assert.equal(allList.length, 2, "one item added");
         });
     })
@@ -104,7 +104,7 @@ QUnit.test("basics", function(assert){
                     sort: "-points",
                     filter: {dueDate: {$gt: new Date(2001,3,30).toString()}}
                 }).then(function(list){
-                    QUnit.deepEqual(list.serialize(),[
+                    assert.deepEqual(list.serialize(),[
                         {
                             _id: 1,
                             name: "lawn",
@@ -127,10 +127,10 @@ QUnit.test("basics", function(assert){
         });
     })
     .then(function(){
-        QUnit.start();
+        done();
     },function(err){
-        QUnit.ok(false,err);
-        QUnit.start();
+        assert.ok(false,err);
+        done();
     });
 
 });
