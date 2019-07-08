@@ -42,7 +42,7 @@
     ]
   },
   "dependencies": {
-    "can-connect": "^3.0.0",
+    "can-connect": "^3.2.1",
     "can-define": "^2.2.0",
     "can-globals": "^1.0.1",
     "can-namespace": "^1.0.0",
