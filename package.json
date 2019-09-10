@@ -44,12 +44,14 @@
     ]
   },
   "dependencies": {
-    "can-connect": "^3.0.0",
-    "can-define": "^2.2.0",
+    "can-connect": "^4.0.0-pre.1",
     "can-globals": "^1.0.1",
     "can-namespace": "^1.0.0",
-    "can-query-logic": "<2.0.0",
-    "can-reflect": "^1.15.2"
+    "can-observable-array": "^1.0.0-pre.7",
+    "can-observable-object": "^1.0.0-pre.3",
+    "can-query-logic": "^1.0.0",
+    "can-reflect": "^1.15.2",
+    "can-type": "^1.0.0-pre.5"
   },
   "devDependencies": {
     "can-fixture": "^3.0.0",

@@ -1,18 +1,21 @@
 var QUnit = require("steal-qunit");
 var fixture = require("can-fixture");
-var DefineMap = require("can-define/map/map");
-var DefineList = require("can-define/list/list");
+var ObservableArray = require("can-observable-array");
+var ObservableObject = require("can-observable-object");
 var realtimeRestModel = require("./can-realtime-rest-model");
 //var stealClone = require("steal-clone");
 var QueryLogic = require("can-query-logic");
 var canReflect = require("can-reflect");
+var type = require("can-type");
 
 QUnit.module("can-realtime-rest-model");
 
 
 QUnit.test("basics", function(assert){
-
     var Status = canReflect.assignSymbols({},{
+        "can.isMember": function() {
+            return false;
+        },
         "can.new": function(val){
 
             return val.toLowerCase();
@@ -25,17 +28,28 @@ QUnit.test("basics", function(assert){
         }
     });
 
-    var Todo = DefineMap.extend("Todo",{
-        _id: {identity: true, type: "number"},
-        name: "string",
-        complete: "boolean",
-        dueDate: "date",
-        points: "number",
-        status: Status
-    });
-    var TodoList = DefineList.extend({
-        "#": Todo
-    });
+    class Todo extends ObservableObject {
+        static get props() {
+            return {
+                _id: {identity: true, type: type.convert(Number)},
+                name: String,
+                complete: type.maybeConvert(Boolean),
+                dueDate: type.convert(Date),
+                points: type.convert(Number),
+                status: Status
+            };
+        }
+    }
+
+    class TodoList extends ObservableArray {
+        static get props() {
+            return {};
+        }
+
+        static get items() {
+            return type.convert(Todo);
+        }
+    }
 
     var connection = realtimeRestModel({
         Map: Todo,
@@ -132,12 +146,11 @@ QUnit.test("basics", function(assert){
         assert.ok(false,err);
         done();
     });
-
 });
 
 QUnit.test("string signature", function(assert) {
     var connection = realtimeRestModel("/api/todos/{_id}");
 
-    assert.ok(new connection.Map() instanceof DefineMap, "Map defined");
-    assert.ok(new connection.List() instanceof DefineList, "List defined");
+    assert.ok(new connection.ArrayType() instanceof ObservableArray, "ArrayType defined");
+    assert.ok(new connection.ObjectType() instanceof ObservableObject, "ObjectType defined");
 });
