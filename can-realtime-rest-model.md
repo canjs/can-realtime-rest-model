@@ -235,13 +235,13 @@ Todo.connection = realtimeRestModel({
 class TodoList extends StacheElement {
     static view = `
       <ul>
-          {{# if(todosPromise.isResolved) }}
-              {{# for(todo of todosPromise.value) }}
+          {{# if(this.todosPromise.isResolved) }}
+              {{# for(todo of this.todosPromise.value) }}
                   <li>
                       <label>{{todo.name}}</label>
                   </li>
               {{/ for }}
-          {{/ if}}
+          {{/ if }}
       </ul>
     `;
 
@@ -261,10 +261,10 @@ class TodoCreate extends StacheElement {
         <form on:submit="createTodo(scope.event)">
             <p>
                 <label>Name</label>
-                <input on:input:value:bind="todo.name" />
+                <input on:input:value:bind="this.todo.name" />
             </p>
-            <button disabled:from="todo.isSaving()">Create Todo</button>
-            {{# if(todo.isSaving()) }}Creating…{{/ if}}
+            <button disabled:from="this.todo.isSaving()">Create Todo</button>
+            {{# if(this.todo.isSaving()) }}Creating…{{/ if }}
         </form>
     `;
 
@@ -314,7 +314,7 @@ Todo.connection = realtimeRestModel({
 
 class TodoDetails extends StacheElement {
     static view = `
-        Todo Name is: {{todoPromise.value.name}}
+        Todo name is: {{this.todoPromise.value.name}}
     `;
 
     static props = {
@@ -332,7 +332,7 @@ customElements.define("todo-details", TodoDetails);
 
 class TodoEdit extends StacheElement {
     static view = `
-        Todo name is: <input value:bind="todoPromise.value.name"/>
+        Todo name is: <input value:bind="this.todoPromise.value.name"/>
     `;
 
     static props = {

@@ -20,10 +20,10 @@ function realtimeRestModel(optionsOrUrl) {
 
 	// If options.ObjectType or .ArrayType aren’t provided, define them
 	if (typeof options.ObjectType === "undefined") {
-		options.ObjectType = class extends ObservableObject {};
+		options.ObjectType = class DefaultObjectType extends ObservableObject {};
 	}
 	if (typeof options.ArrayType === "undefined") {
-		options.ArrayType = class extends ObservableArray {
+		options.ArrayType = class DefaultArrayType extends ObservableArray {
 			static get items() {
 				return type.convert(options.ObjectType);
 			}
