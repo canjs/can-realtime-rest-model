@@ -314,7 +314,7 @@ Todo.connection = realtimeRestModel({
 
 class TodoDetails extends StacheElement {
     static view = `
-        Todo name is: {{this.todoPromise.value.name}}
+        Todo name is: {{ this.todoPromise.value.name }}
     `;
 
     static props = {
