@@ -1,6 +1,6 @@
 {
   "name": "can-realtime-rest-model",
-  "version": "2.0.0-pre.0",
+  "version": "2.0.0",
   "description": "Turn a map into a realtime rest model",
   "homepage": "http://canjs.com",
   "repository": {
