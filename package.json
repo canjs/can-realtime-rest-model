@@ -57,7 +57,7 @@
     "can-fixture": "^3.0.0",
     "http-server": "^0.11.0",
     "jshint": "^2.9.1",
-    "steal": "^2.1.14",
+    "steal": "^2.2.4",
     "steal-qunit": "^2.0.0",
     "steal-tools": "^2.0.11",
     "test-saucelabs": "^0.0.6",
