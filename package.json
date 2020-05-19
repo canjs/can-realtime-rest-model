@@ -47,7 +47,7 @@
     "can-connect": "^4.0.0",
     "can-globals": "^1.0.1",
     "can-namespace": "^1.0.0",
-    "can-observable-array": "^1.0.0",
+    "can-observable-array": "^1.0.8",
     "can-observable-object": "^1.0.0",
     "can-query-logic": "^1.0.0",
     "can-reflect": "^1.15.2",
